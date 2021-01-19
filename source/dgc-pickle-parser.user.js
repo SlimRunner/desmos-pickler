@@ -6,10 +6,9 @@
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
 // @match       https://*.desmos.com/calculator*
-// ==/UserScript==
-
 // @downloadURL https://github.com/SlimRunner/desmos-pickler/raw/master/source/dgc-pickle-parser.user.js
 // @updateURL   https://github.com/SlimRunner/desmos-pickler/raw/master/source/dgc-pickle-parser.user.js
+// ==/UserScript==
 
 /*jshint esversion: 6 */
 
