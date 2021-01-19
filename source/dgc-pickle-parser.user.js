@@ -8,8 +8,8 @@
 // @match       https://*.desmos.com/calculator*
 // ==/UserScript==
 
-// @downloadURL VOID
-// @updateURL   VOID
+// @downloadURL https://github.com/SlimRunner/desmos-pickler/raw/master/source/dgc-pickle-parser.user.js
+// @updateURL   https://github.com/SlimRunner/desmos-pickler/raw/master/source/dgc-pickle-parser.user.js
 
 /*jshint esversion: 6 */
 
