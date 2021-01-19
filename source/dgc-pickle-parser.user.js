@@ -22,9 +22,9 @@
 	// Global data structures & objects
 	
 	const FILE_SIGNATURE = 'PCKL';
-	
 	var ctrs;
 	
+	// creates an error with custom name
 	class CustomError extends Error {
 		/* Source
 		* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
@@ -44,9 +44,8 @@
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	// GUI Management - Main
-	// dcg-icon-download
-	// dcg-icon-export
 	
+	// Initializes the script GUI
 	function initGUI() {
 		insertNodes(document.head, {
 			group : [{
@@ -148,6 +147,7 @@
 		
 	}
 	
+	// moves the GUI buttons in sync with Desmos GUI
 	function resizeDrawer(cnRect) {
 		let x, y;
 		let pillbox = document.querySelector(
@@ -172,9 +172,7 @@
 		});
 	}
 	
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-	// EVENT HANDLERS
-	
+	// initializes the event handlers of the GUI
 	function loadHandlers() {
 		ctrs.loadButton.addEventListener('change', (evt) => {
 			let fRead = new FileReader();
@@ -202,6 +200,9 @@
 			)
 		});
 	}
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	// Encoding & Data Parsing
 	
 	// validates image and loads graph
 	function deserializeImage(imgData) {
@@ -232,6 +233,7 @@
 		saveImage(imgBuffer, adjSize.x, adjSize.y);
 	}
 	
+	// grabs serialized data and plots it in a image to be saved
 	function saveImage(serial, width, height) {
 		let size = width * height;
 		let canv = document.createElement('canvas');
