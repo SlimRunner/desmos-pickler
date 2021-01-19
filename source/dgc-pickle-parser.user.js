@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.0.0
+// @version     1.0.1
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -21,7 +21,7 @@
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 	// Global data structures & objects
 	
-	const MAGICWORD = 'PCKL';
+	const FILE_SIGNATURE = 'PCKL';
 	
 	var ctrs;
 	
@@ -203,21 +203,26 @@
 	
 	// validates image and loads graph
 	function deserializeImage(imgData) {
-		let fBuffer = imgData.data.filter((e,i) => i % 4 != 3);
-		let magicWord = fBuffer.slice(0, 4);
-		if (String.fromCharCode.apply(null, magicWord) === MAGICWORD) {
+		let fBuffer = imgData.data
+			.filter((e,i) => i % 4 != 3)
+			.map((e,i) => (i < 8? e: 255 - e));
+		let fileSig = fBuffer.slice(0, 4);
+		if (String.fromCharCode.apply(null, fileSig) === FILE_SIGNATURE) {
 			let size = parseDWord(fBuffer.slice(4, 8));
-			let pixelData = fBuffer.slice(8, 8 + size).map(e => 255 - e);
-			let json = String.fromCharCode.apply(null, pixelData);
+			let pixelData = fBuffer.slice(8, 8 + size);
+			let json = new TextDecoder().decode(pixelData);
 			Calc.setState(JSON.parse(json));
 		}
 	}
 	
 	// returns prepared data as a buffer to be turned into image
 	function buildSerial(jsonData) {
-		let ascii = [...jsonData].map(e => 255 - e.charCodeAt(0));
-		let header = [...MAGICWORD].map(e => e.charCodeAt(0));
-		header.push(...getDWord(jsonData.length));
+		// https://stackoverflow.com/a/41180394
+		let ascii = Array.from(
+			new TextEncoder('utf-8').encode(jsonData)
+		).map(e => 255 - e);
+		let header = [...FILE_SIGNATURE].map(e => e.charCodeAt(0));
+		header.push(...getDWord(ascii.length));
 		let rawSize = Math.ceil((ascii.length + header.length) / 3);
 		let adjSize = getMinimalSquare(rawSize);
 		let padding = Array(adjSize.x * adjSize.y - rawSize);
@@ -239,7 +244,7 @@
 			imageData.data[i] = 0xff;
 		}
 		ctx.putImageData(imageData, 0, 0);
-		download(canv.toDataURL('image/png'), getGraphName(), 'image/png');
+		download(canv.toDataURL('image/png'), getGraphName());
 	}
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -319,13 +324,13 @@
 		let R1, R2, R3, R4;
 		if (littleEnd) {
 			R1 = value >> 0x18;
-			R2 = value >> 0x10 & 0x00ff;
-			R3 = value >>  0x8 & 0x0000ff;
-			R4 = value         & 0x000000ff;
+			R2 = value >> 0x10 & 0xff;
+			R3 = value >>  0x8 & 0xff;
+			R4 = value         & 0xff;
 		} else {
-			R1 = value         & 0x000000ff;
-			R2 = value >>  0x8 & 0x0000ff;
-			R3 = value >> 0x10 & 0x00ff;
+			R1 = value         & 0xff;
+			R2 = value >>  0x8 & 0xff;
+			R3 = value >> 0x10 & 0xff;
 			R4 = value >> 0x18;
 		}
 		return [R1, R2, R3, R4];
