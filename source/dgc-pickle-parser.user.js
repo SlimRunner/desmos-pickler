@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.0.1
+// @version     1.0.2
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -95,6 +95,9 @@
 				],
 				group: [{
 					tag: 'label',
+					attributes: [
+						{name: 'title', value: 'Load pickle'}
+					],
 					classes : [
 						'dpk-sli-menu-button',
 						'dpk-sli-dcg-icon-align',
@@ -105,7 +108,6 @@
 						tag: 'input',
 						varName: 'loadButton',
 						attributes: [
-							{name: 'title', value: 'Load pickle'},
 							{name: 'type', value: 'file'},
 							{name: 'accept', value: 'image/png'}
 						]
