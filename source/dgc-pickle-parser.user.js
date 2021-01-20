@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.0.2
+// @version     1.0.3
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -215,6 +215,7 @@
 			let pixelData = fBuffer.slice(8, 8 + size);
 			let json = new TextDecoder().decode(pixelData);
 			Calc.setState(JSON.parse(json));
+			loadScripts(Calc);
 		}
 	}
 	
@@ -355,6 +356,32 @@
 			x: Math.ceil(Math.sqrt(cellCount)),
 			y: Math.round(Math.sqrt(cellCount))
 		};
+	}
+	
+	// DesmosLoader script by Cyan
+	function loadScripts(Calc) {
+		let exprs = Array.from(Calc.getState().expressions.list);
+		let first = exprs[0];
+		if (first.type === 'text') {
+			let text = first.text;
+			let textsplit = text.split('\n').filter(
+				line => line.startsWith('include ')
+			).map(line => line.slice(8));
+			let folders = exprs.filter((expr) => expr.type === 'folder');
+			if (
+				textsplit.length > 0 &&
+				confirm(`This graph contains a script.\n\nDo you want to load the script?`)
+			) {
+				for (const line of textsplit) {
+					let folder = folders.find(folder => folder.title === line);
+					let matchfolderid = folder ? folder.id : '';
+					let texts = exprs.filter(expr => (expr.type == 'text' && expr.folderId === matchfolderid));
+					for (const code of texts) {
+						window.eval(code.text);
+					}
+				}
+			}
+		}
 	}
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
