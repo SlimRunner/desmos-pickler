@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.0.3
+// @version     1.0.4
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -372,14 +372,17 @@
 				textsplit.length > 0 &&
 				confirm(`This graph contains a script.\n\nDo you want to load the script?`)
 			) {
-				for (const line of textsplit) {
-					let folder = folders.find(folder => folder.title === line);
-					let matchfolderid = folder ? folder.id : '';
-					let texts = exprs.filter(expr => (expr.type == 'text' && expr.folderId === matchfolderid));
-					for (const code of texts) {
-						window.eval(code.text);
+				Calc.observe('expressionAnalysis.scriptRun', () => {
+					Calc.unobserve('expressionAnalysis.scriptRun');
+					for (const line of textsplit) {
+						let folder = folders.find(folder => folder.title === line);
+						let matchfolderid = folder ? folder.id : '';
+						let texts = exprs.filter(expr => (expr.type == 'text' && expr.folderId === matchfolderid));
+						for (const code of texts) {
+							window.eval(code.text);
+						}
 					}
-				}
+				});
 			}
 		}
 	}
