@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.0.6
+// @version     1.1.0
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -185,6 +185,7 @@
 	// initializes the event handlers of the GUI
 	function loadHandlers() {
 		ctrs.loadButton.addEventListener('change', (evt) => {
+			const displayName = evt.target.files[0].name.replace(/.png$/i, '');
 			let fRead = new FileReader();
 			fRead.addEventListener('load', () => {
 				let tImg = document.createElement('img');
@@ -195,6 +196,7 @@
 					let ctx = canv.getContext('2d');
 					ctx.drawImage(tImg, 0, 0);
 					setTimeout(() => {
+						setGraphName(displayName);
 						deserializeImage(ctx.getImageData(0, 0, tImg.width, tImg.height));
 					}, 0);
 				}, {once: true});
@@ -332,6 +334,19 @@
 			.graphsController
 			.currentGraph
 			.title || 'untitled';
+	}
+
+	// returns the current name of the graph
+	function setGraphName(graphTitle) {
+		// return document.querySelector('span.dcg-variable-title').innerText;
+		// courtesy of fireflame241#3111
+		Calc
+			._calc
+			.globalHotkeys
+			.headerController
+			.graphsController
+			.currentGraph
+			.setProperty('title', graphTitle);
 	}
 	
 	// returns an array of four bytes in the endianness specified
