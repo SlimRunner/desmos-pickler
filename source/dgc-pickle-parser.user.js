@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.2.1
+// @version     1.2.2
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -75,9 +75,9 @@
 				nodeContent :
 				`.dpk-sli-prop-menu {
 					display: flex;
-					gap: 8px;
+					gap: 5px;
 					
-					position: fixed !important;
+					position: fixed;
 					transition: opacity 0.1s ease-out;
 					
 					padding: 0px;
@@ -86,8 +86,9 @@
 				.dpk-sli-menu-button {
 					background: #ededed;
 					padding: 5px;
-					width: 38px;
-					height: 38px;
+					width: 37px;
+					height: 37px;
+					pointer-events: initial;
 				}
 				
 				.dpk-sli-dcg-icon-align {
@@ -154,39 +155,32 @@
 			}]
 		});
 		
-		let cnSizeObs = new ResizeObserver((ents) => {
-			resizeDrawer(ents[0].target.getBoundingClientRect());
+		let pillSizeObs = new ResizeObserver((ents) => {
+			resizeDrawer(ents[0].target);
 		});
 		
-		cnSizeObs.observe(
-			document.querySelector('canvas.dcg-graph-inner')
-		);
-		
+		const pillbox = document.querySelector('.dcg-overgraph-pillbox-elements');
+
+		if (pillbox) {
+			ctrs.drawerMenu.style.position = "absolute";
+			pillbox.insertBefore(ctrs.drawerMenu, null);
+			pillSizeObs.observe(pillbox);
+			resizeDrawer(pillbox);
+		} else {
+			resizeDrawer(null);
+		}
 	}
 	
 	// moves the GUI buttons in sync with Desmos GUI
-	function resizeDrawer(cnRect) {
-		let x, y;
-		let pillbox = document.querySelector(
-			'div.dcg-overgraph-pillbox-elements'
-		);
-		
+	function resizeDrawer(pillbox) {
 		if (pillbox != null) {
-			let pbRect = pillbox.getBoundingClientRect();
-			let dwRect = ctrs.drawerMenu.getBoundingClientRect();
-			
-			x = pbRect.left - dwRect.width - 8;
-			y = pbRect.top + 3;
+			const {width} = pillbox.getBoundingClientRect();
+			ctrs.drawerMenu.style.right = `${5 + width}px`;
+			ctrs.drawerMenu.style.top = `${0}px`;
 		} else {
-			let dwRect = ctrs.drawerMenu.getBoundingClientRect();
-			x = cnRect.left + cnRect.width - dwRect.width - 5;
-			y = cnRect.top + 5;
+			ctrs.drawerMenu.style.right = `${-5}px`;
+			ctrs.drawerMenu.style.top = `${0}px`;
 		}
-		
-		Object.assign(ctrs.drawerMenu.style, {
-			left: x + 'px',
-			top: y + 'px'
-		});
 	}
 	
 	// initializes the event handlers of the GUI
