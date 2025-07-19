@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.2.3
+// @version     1.2.4
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -423,21 +423,19 @@
 	
 	// returns the current name of the graph
 	function getGraphName() {
-		// courtesy of fireflame241#3111
-		return Calc
-			._calc
-			.globalHotkeys
-			.mygraphsController
-			.graphsController
-			.currentGraph
-			.title || 'untitled';
+		const gc = Calc?._calc?.globalHotkeys?.shellController?.graphsController;
+		if (gc != null && gc.isCurrentGraphTitled() && gc?.getCurrentGraphTitle() != null) {
+			return gc.getCurrentGraphTitle();
+		} else {
+			return "undefined";
+		}
 	}
 
 	function setGraphName(graphTitle) {
 		Calc
 			._calc
 			.globalHotkeys
-			.mygraphsController
+			.shellController
 			.graphsController
 			.currentGraph
 			.title = graphTitle;
