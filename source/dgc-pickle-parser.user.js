@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        DesmosPickler
 // @namespace   slidav.Desmos
-// @version     1.2.4
+// @version     1.2.5
 // @author      SlimRunner (David Flores)
 // @description Serializes a Desmos graph into a PNG image
 // @grant       none
@@ -427,20 +427,20 @@
 		if (gc != null && gc.isCurrentGraphTitled() && gc?.getCurrentGraphTitle() != null) {
 			return gc.getCurrentGraphTitle();
 		} else {
-			return "undefined";
+			return "untitled_graph";
 		}
 	}
 
 	function setGraphName(graphTitle) {
-		Calc
-			._calc
-			.globalHotkeys
-			.shellController
-			.graphsController
-			.currentGraph
-			.title = graphTitle;
+		const gc = Calc?._calc?.globalHotkeys?.shellController?.graphsController;
+
+		if (gc?.getCurrentGraph() != null) {
+			gc.getCurrentGraph().title ??= graphTitle;
+		} else {
+			console.warn("Title could not be set.")
+		}
 	}
-	
+
 	// returns an array of four bytes in the endianness specified
 	function getDWord(value, littleEnd = true) {
 		let R1, R2, R3, R4;
